@@ -1,0 +1,18 @@
+.movie_info {
+  background-color: white;
+  position: sticky;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.movie_info span {
+  margin: 1%;
+}
+
+.movie_image {
+  width: 100px;
+  height: 150px;
+}

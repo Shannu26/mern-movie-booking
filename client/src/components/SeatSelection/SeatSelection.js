@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import classes from "./SeatSelection.module.css";
-import Seat from "./Seat/Seat";
+import Seat from "../Seat/Seat";
+import MovieInfo from "../MovieInfo/MovieInfo";
 
 function SeatSelection(props) {
   const movie_name = props.movie_name;
@@ -7,25 +9,72 @@ function SeatSelection(props) {
   const movie_date = props.movie_date;
   const movie_time = props.movie_time;
   const movie_image = props.movie_image;
-  const seat_layout = [];
+  const [seatLayout, setSeatLayout] = useState({});
+  const [selectedSeats, setSelectedSeats] = useState(new Set());
 
-  // Initialising a dummy seat layout
-  for (var row = 0; row < 15; row++) {
-    seat_layout.push(15 - row);
-  }
+  const seatSelected = (seat_number) => {
+    setSelectedSeats((prev_state) => {
+      var new_state = new Set([...prev_state]);
+      if (new_state.has(seat_number)) {
+        new_state.delete(seat_number);
+      } else {
+        new_state.add(seat_number);
+      }
+      return new_state;
+    });
+  };
+
+  useEffect(() => {
+    // Initialising a dummy seat layout
+    const seat_layout = {};
+    for (var row = 0; row < 15; row++) {
+      const next_row = [];
+      for (var col = 0; col < 20; col++) {
+        next_row.push({
+          row_number: String.fromCharCode(row + 65),
+          seat_number: col + 1,
+          booked: col === 0,
+          hidden: row === col,
+        });
+      }
+      seat_layout[String.fromCharCode(row + 65)] = next_row;
+    }
+    setSeatLayout(seat_layout);
+  }, []);
+
+  const Seats = [];
+  Object.entries(seatLayout).forEach(([row_number, seats]) => {
+    Seats.push(
+      <div key={row_number} className={classes.row}>
+        {seats.map((seat) => {
+          const seat_number = `${row_number}${seat.seat_number}`;
+          return (
+            <Seat
+              key={seat_number}
+              seat_number={seat_number}
+              booked={seat.booked}
+              hidden={seat.hidden}
+              selected={selectedSeats.has(seat_number)}
+              clicked={seatSelected}
+            />
+          );
+        })}
+      </div>
+    );
+  });
 
   return (
     <div className={classes.seat_selection}>
-      <div>
-        {seat_layout.map((row) => (
-          <Seat key={row} seat_number={row}></Seat>
-        ))}
-      </div>
-      <div>
-        {seat_layout.map((row) => (
-          <Seat key={row} seat_number={row}></Seat>
-        ))}
-      </div>
+      <MovieInfo
+        movie_name="Harry Potter"
+        movie_theater="AMC NewPark 12"
+        movie_date="Wednesday, 26 Jan, 2024"
+        movie_time="10:00 AM"
+        movie_image="https://i.ebayimg.com/images/g/Bo8AAOSwrLZjJjso/s-l1600.jpg"
+        selectedSeats={selectedSeats}
+        number_of_tickets={selectedSeats.size}
+      />
+      {Seats}
     </div>
   );
 }

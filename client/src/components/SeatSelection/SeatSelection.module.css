@@ -1,5 +1,15 @@
 .seat_selection {
-  color: white;
   background-color: rgba(211, 211, 211, 0.1);
   margin: 2%;
+  padding-left: 1px;
+  padding-right: 1px;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+}
+
+.row * {
+  flex-shrink: 0;
 }
